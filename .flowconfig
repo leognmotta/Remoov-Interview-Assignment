@@ -1,0 +1,20 @@
+[ignore]
+# Overriden modules
+.*/node_modules/webpack/.*
+.*/node_modules/html-webpack-plugin/.*
+# Broken modules
+.*/node_modules/zalgo-promise/.*
+.*/node_modules/cross-domain-safe-weakmap/.*
+
+[include]
+
+[libs]
+src/Flow.js
+
+[options]
+experimental.strict_call_arity=true
+suppress_comment=\\(.\\|\n\\)*\\$FlowFixMe
+esproposal.export_star_as=enable
+esproposal.decorators=ignore
+module.name_mapper='.*\(.s?css\)$' -> 'empty/object'
+module.name_mapper='.*\(.ico\)$' -> 'empty/object'

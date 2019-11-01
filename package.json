@@ -1,0 +1,173 @@
+{
+  "name": "Remoov",
+  "private": true,
+  "engines": {
+    "node": "11.14.0",
+    "yarn": "1.19.1"
+  },
+  "scripts": {
+    "reset-db": "node ./build/reset-db.js",
+    "dev": "node node_modules/webpack/bin/webpack.js --config build/dev.js",
+    "format": "prettier --config ./prettier.config.js --write 'src/**/*.js'",
+    "test": "mochapack --webpack-config build/test.js --interactive false --require source-map-support/register 'test/**/*Test.js' --watch",
+    "static-check": "flow && eslint src test"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/node": "7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-proposal-decorators": "^7.0.0",
+    "@babel/plugin-proposal-export-namespace-from": "^7.0.0",
+    "@babel/plugin-proposal-function-sent": "^7.0.0",
+    "@babel/plugin-proposal-json-strings": "^7.0.0",
+    "@babel/plugin-proposal-numeric-separator": "^7.0.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/plugin-proposal-throw-expressions": "^7.0.0",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
+    "@babel/plugin-syntax-import-meta": "^7.0.0",
+    "@babel/plugin-transform-async-to-generator": "^7.1.0",
+    "@babel/plugin-transform-flow-strip-types": "^7.0.0",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.0",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-async-to-promises": "^0.7.0",
+    "babel-plugin-transform-inline-environment-variables": "^0.2.0",
+    "babel-preset-react-native": "4.0.0",
+    "body-parser": "^1.18.3",
+    "bootstrap": "3.3.5",
+    "core-js": "^2",
+    "css-loader": "^0.28.11",
+    "empty": "^0.10.1",
+    "eslint": "4.19.1",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-babel": "4.1.2",
+    "eslint-plugin-flowtype": "^2.20.0",
+    "eslint-plugin-react": "7.4.0",
+    "express": "^4.16.3",
+    "file-loader": "^1.1.11",
+    "flow-bin": "0.91.0",
+    "html-webpack-plugin": "3.2.0",
+    "iso-morphic-style-loader": "^2.0.1",
+    "mocha": "4.1.0",
+    "mochapack": "^1.0.0",
+    "moment": "2.18.1",
+    "moment-timezone": "0.5.13",
+    "node-sass": "^4.9.0",
+    "nodemon-webpack-plugin": "4.0.7",
+    "null-loader": "^0.1.1",
+    "paypal-checkout": "^4.0.257",
+    "photoswipe": "^4.1.2",
+    "postcss-loader": "^2.1.5",
+    "prettier": "^1.16.4",
+    "react": "16.6.3",
+    "react-bootstrap": "0.32.4",
+    "react-dom": "16.6.3",
+    "react-router-bootstrap": "0.24.4",
+    "react-router-dom": "^4.2.2",
+    "regenerator-runtime": "^0.13.2",
+    "sass-loader": "^7.0.1",
+    "script-loader": "^0.7.2",
+    "source-map-support": "^0.5.9",
+    "sqlite3": "^4.1.0",
+    "url-loader": "^1.0.1",
+    "webpack": "4.39.1",
+    "webpack-cli": "3.3.6",
+    "webpack-node-externals": "^1.7.2",
+    "webpack-notifier": "1.5.0"
+  },
+  "eslintConfig": {
+    "globals": {
+      "Buffer": false,
+      "require": false,
+      "process": false,
+      "console": false,
+      "window": false,
+      "global": false,
+      "document": false,
+      "setTimeout": false,
+      "clearTimeout": false,
+      "setInterval": false,
+      "clearInterval": false,
+      "Image": false,
+      "FormData": false,
+      "FileReader": false,
+      "moment": false,
+      "Promise": false,
+      "XMLHttpRequest": false,
+      "module": false,
+      "expect": false,
+      "confirm": false,
+      "alert": false,
+      "atob": false,
+      "ArrayBuffer": false,
+      "Blob": false,
+      "Connection": false,
+      "DataView": false,
+      "localStorage": false,
+      "networking": false,
+      "Uint16Array": false,
+      "Uint8Array": false,
+      "File": false,
+      "fetch": false,
+      "describe": false,
+      "fdescribe": false,
+      "it": false,
+      "fit": false,
+      "beforeEach": false,
+      "before": false,
+      "afterEach": false,
+      "after": false,
+      "URL": false
+    },
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "ecmaVersion": 7,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "plugins": [
+      "react",
+      "flowtype"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:flowtype/recommended"
+    ],
+    "settings": {
+      "react": {
+        "pragma": "React",
+        "version": "16.6.3"
+      },
+      "flowtype": {
+        "onlyFilesWithFlowAnnotation": true
+      }
+    },
+    "rules": {
+      "no-unused-vars": [
+        2,
+        {
+          "args": "all",
+          "argsIgnorePattern": "^_"
+        }
+      ],
+      "react/no-unescaped-entities": 0,
+      "react/jsx-no-target-blank": 0,
+      "react/jsx-key": 0,
+      "react/jsx-no-undef": [
+        2,
+        {
+          "allowGlobals": true
+        }
+      ],
+      "flowtype/space-after-type-colon": 0,
+      "flowtype/generic-spacing": 0
+    }
+  }
+}
