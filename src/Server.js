@@ -6,6 +6,7 @@ import bodyParser from 'body-parser';
 import sqlite3 from 'sqlite3';
 import type, {Pickup, Item} from './Common';
 import {centsToDollars, intToBoolean} from './Common';
+import {parse} from 'json2csv';
 const PORT = 5000;
 
 const fromRootPath = (p) => path.join(process.cwd(), p);
@@ -15,6 +16,7 @@ express()
   .use('/assets', express.static('tmp/'))
   .get(['/', '/pickups', '/items'], sendPage)
   .get('/pickups.json', sendPickupsJson)
+  .get('/pickups.csv', sendPickupsCSV)
   .use(bodyParser.json({limit: '50mb'}))
   .use(bodyParser.urlencoded({limit: '50mb', extended: true}))
   .post('/api', apiPost)
@@ -23,6 +25,7 @@ express()
 function sendPage(_: any, response: any): void {
   return response.sendFile(fromRootPath('tmp/index.html'));
 }
+
 async function sendPickupsJson(request: any, response: any): Promise<void> {
   try {
     const {body} = request;
@@ -38,6 +41,29 @@ async function sendPickupsJson(request: any, response: any): Promise<void> {
     response.setHeader('Cache-Control', 'no-cache');
     response.setHeader('Pragma', 'no-cache');
     response.status(200).send(pickupsJson);
+    return;
+  } catch (error) {
+    log(`error: ${error.message}`);
+    return response.status(400).json(error.message);
+  }
+}
+
+async function sendPickupsCSV(request: any, response: any): Promise<void> {
+  try {
+    const {body} = request;
+    log(`request ${JSON.stringify(body)}`);
+    const pickups = await db().loadPickups();
+    const pickupsJson = JSON.stringify(pickups);
+    const pickupCSV = json2CSV(pickupsJson);
+    log(`success ${pickupsJson}`);
+    response.setHeader('Content-Type', 'text/csv');
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename="pickups-${Date.now()}.csv"`,
+    );
+    response.setHeader('Cache-Control', 'no-cache');
+    response.setHeader('Pragma', 'no-cache');
+    response.status(200).send(pickupCSV);
     return;
   } catch (error) {
     log(`error: ${error.message}`);
@@ -87,6 +113,11 @@ function db(): * {
       const itemIds = itemRows
         .filter(({pickup_id}) => pickup_id === id)
         .map(({id}) => id);
+
+      console.log('test ', pickupRows);
+      // (pickup price) - (sum of all items (unit_price * quantity))
+      // (10000) - (5 (10000 * 1))
+      // const balance_due = getBalanceDue()
       return {
         id,
         name,
@@ -118,6 +149,41 @@ function db(): * {
       });
     });
   }
+}
+
+function json2CSV(data) {
+  const parsedData = JSON.parse(data);
+
+  const fields = [
+    {
+      label: 'ID',
+      value: 'id',
+    },
+    {
+      label: 'Name',
+      value: 'name',
+    },
+    {
+      label: 'Tags',
+      value: 'tags',
+    },
+    // {
+    //   label: 'Balance Due',
+    //   value: 'balanceDue',
+    // },
+  ];
+
+  const opts = {fields};
+
+  const processedData = parsedData.map(({id, name, tags}) => {
+    return {
+      id,
+      name,
+      tags: tags.join(','),
+    };
+  });
+
+  return parse(processedData, opts);
 }
 
 function log(...messages): void {

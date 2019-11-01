@@ -72,6 +72,9 @@ class Pickups extends PureComponent<{}, {pickups: Pickup[]}> {
         <Button style={{float: 'right'}} href='pickups.json'>
           Download JSON
         </Button>
+        <Button style={{float: 'right'}} href='pickups.csv'>
+          Download CSV
+        </Button>
         {!pickups && <p>Loading...</p>}
         {pickups && (
           <Table striped bordered condensed hover>
