@@ -9,7 +9,7 @@ import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import {LinkContainer} from 'react-router-bootstrap';
 import {Navbar, Nav, NavItem, Table, PageHeader, Button} from 'react-bootstrap';
 import './index.scss';
-import type, {Pickup, Item} from '../Common';
+import type {Pickup, Item} from '../Common';
 
 setTimeout(() => {
   const mountElement = document.getElementById('mount');
@@ -89,15 +89,28 @@ class Pickups extends PureComponent<{}, {pickups: Pickup[]}> {
               </tr>
             </thead>
             <tbody>
-              {pickups.map(({id, name, tags, price, itemIds}, index) => (
-                <tr key={index}>
-                  <td>{id}</td>
-                  <td>{name}</td>
-                  <td>{tags.join(',')}</td>
-                  <td>{price}</td>
-                  <td>{itemIds.join(',')}</td>
-                </tr>
-              ))}
+              {pickups.map(
+                (
+                  {
+                    id,
+                    name,
+                    tags,
+                    formatted_price,
+                    itemIds,
+                    formatted_balance_due,
+                  },
+                  index,
+                ) => (
+                  <tr key={index}>
+                    <td>{id}</td>
+                    <td>{name}</td>
+                    <td>{tags.join(',')}</td>
+                    <td>{formatted_price}</td>
+                    <td>{itemIds.join(',')}</td>
+                    <td>{formatted_balance_due}</td>
+                  </tr>
+                ),
+              )}
             </tbody>
           </Table>
         )}
@@ -131,12 +144,15 @@ class Items extends PureComponent<{}, {items: Item[]}> {
             </thead>
             <tbody>
               {items.map(
-                ({id, pickup_id, title, unit_price, quantity, sold}, index) => (
+                (
+                  {id, pickup_id, title, formatted_unit_price, quantity, sold},
+                  index,
+                ) => (
                   <tr key={index}>
                     <td>{id}</td>
                     <td>{pickup_id}</td>
                     <td>{title}</td>
-                    <td>{unit_price}</td>
+                    <td>{formatted_unit_price}</td>
                     <td>{quantity}</td>
                     <td>{sold ? 'Yes' : 'No'}</td>
                   </tr>

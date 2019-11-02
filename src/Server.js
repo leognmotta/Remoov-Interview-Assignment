@@ -4,8 +4,13 @@ import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
 import sqlite3 from 'sqlite3';
-import type, {Pickup, Item} from './Common';
-import {centsToDollars, intToBoolean} from './Common';
+import type {Pickup, Item} from './Common';
+import {
+  centsToDollars,
+  intToBoolean,
+  getBalanceDue,
+  formatNumberToDollar,
+} from './Common';
 import {parse} from 'json2csv';
 const PORT = 5000;
 
@@ -54,8 +59,9 @@ async function sendPickupsCSV(request: any, response: any): Promise<void> {
     log(`request ${JSON.stringify(body)}`);
     const pickups = await db().loadPickups();
     const pickupsJson = JSON.stringify(pickups);
-    const pickupCSV = json2CSV(pickupsJson);
     log(`success ${pickupsJson}`);
+    const pickupCSV = json2CSV(pickupsJson);
+    log(`success ${pickupCSV}`);
     response.setHeader('Content-Type', 'text/csv');
     response.setHeader(
       'Content-Disposition',
@@ -102,7 +108,7 @@ function db(): * {
     const pickupRows = await selectAll('SELECT * FROM pickups');
     const pickupTagRows = await selectAll('SELECT * FROM pickups_tags');
     const tagRows = await selectAll('SELECT * FROM tags');
-    const itemRows = await selectAll('SELECT pickup_id, id FROM items');
+    const itemRows = await selectAll('SELECT * FROM items');
     return pickupRows.map(({id, name, price_in_cents}) => {
       const tagIds = pickupTagRows
         .filter(({pickup_id}) => pickup_id === id)
@@ -110,20 +116,20 @@ function db(): * {
       const tags = tagRows
         .filter(({id}) => tagIds.includes(id))
         .map(({name}) => name);
-      const itemIds = itemRows
-        .filter(({pickup_id}) => pickup_id === id)
-        .map(({id}) => id);
-
-      console.log('test ', pickupRows);
-      // (pickup price) - (sum of all items (unit_price * quantity))
-      // (10000) - (5 (10000 * 1))
-      // const balance_due = getBalanceDue()
+      const items = itemRows.filter(({pickup_id}) => pickup_id === id);
+      const itemIds = items.map(({id}) => id);
+      const balance_due = getBalanceDue(items, price_in_cents);
       return {
         id,
         name,
         price: centsToDollars(price_in_cents),
+        formatted_price: formatNumberToDollar(centsToDollars(price_in_cents)),
         itemIds,
         tags,
+        balance_due: centsToDollars(balance_due),
+        formatted_balance_due: formatNumberToDollar(
+          centsToDollars(balance_due),
+        ),
       };
     });
   }
@@ -135,7 +141,11 @@ function db(): * {
         id,
         pickup_id,
         title,
+        unit_price_in_cents: unit_price_in_cents,
         unit_price: centsToDollars(unit_price_in_cents),
+        formatted_unit_price: formatNumberToDollar(
+          centsToDollars(unit_price_in_cents),
+        ),
         quantity,
         sold: intToBoolean(sold),
       }),
@@ -167,19 +177,20 @@ function json2CSV(data) {
       label: 'Tags',
       value: 'tags',
     },
-    // {
-    //   label: 'Balance Due',
-    //   value: 'balanceDue',
-    // },
+    {
+      label: 'Balance Due',
+      value: 'balance_due',
+    },
   ];
 
   const opts = {fields};
 
-  const processedData = parsedData.map(({id, name, tags}) => {
+  const processedData = parsedData.map(({id, name, tags, balance_due}) => {
     return {
       id,
       name,
       tags: tags.join(','),
+      balance_due,
     };
   });
 
